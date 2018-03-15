@@ -1,7 +1,6 @@
 const Lab = require('lab')
 const lab = exports.lab = Lab.script()
 const { expect } = require('code')
-const Boom = require('Boom')
 // const Server = require('../src/server.js')
 // const knex = require('../src/db/connection')
 var request = require('request')
