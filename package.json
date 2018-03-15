@@ -1,0 +1,48 @@
+{
+  "name": "hospitality-api",
+  "version": "1.0.0",
+  "description": "Hotel api gateway",
+  "scripts": {
+    "start": "gulp --gulpfile gulpfile.js",
+    "lint:fix": "eslint ./ --fix",
+    "test": "./node_modules/lab/bin/lab -v -L -C -c -t 85",
+    "dev:migrate": "./migrate-db-dev.sh",
+    "test:migrate": "./migrate-db-test.sh",
+    "dev:start": "./run-dev.sh",
+    "dev:uninstall": "docker-compose -f docker-compose.yml down --rmi all",
+    "dev:up": "docker-compose -f docker-compose.yml up",
+    "dev:build": "docker-compose -f docker-compose.yml build",
+    "dev:down": "docker-compose -f docker-compose.yml down",
+    "dev:connect:api": "docker exec -it api-gateway /bin/sh",
+    "dev:connect:db": "docker exec -it postgres-db /bin/sh && psql -h localhost -p 5432 -U postgres -d hotel_dev",
+    "dev:clean": "docker rmi $(docker images -f \"dangling=true\" -q)"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-eslint": "^8.2.2",
+    "code": "^5.2.0",
+    "eslint": "^4.18.2",
+    "eslint-plugin-import": "^2.9.0",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^4.0.2",
+    "gulp-nodemon": "^2.2.1",
+    "lab": "^15.4.0",
+    "request": "^2.85.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "boom": "^7.2.0",
+    "dotenv": "^5.0.1",
+    "hapi": "^17.2.2",
+    "hapi-swagger": "^9.1.1",
+    "hoek": "^5.0.3",
+    "inert": "^5.1.0",
+    "joi": "^13.1.2",
+    "knex": "^0.14.4",
+    "lodash": "^4.17.5",
+    "moment": "^2.21.0",
+    "pg": "^7.4.1",
+    "vision": "^5.3.1"
+  }
+}
