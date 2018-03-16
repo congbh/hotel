@@ -1,20 +1,31 @@
+const { withFirst, withInsert, withLimit, withOffset, withSelect, withReturning, withUpdate, withWhere } = require('./_hocHelpers')
 const Boom = require('Boom')
-const bcrypt = require('bcryptjs')
-const knex = require('../db/connection')
+const GUID = require('node-uuid')
 const _ = require('lodash')
-const crypto = require('crypto')
+const Bcrypt = require('bcryptjs')
+const Crypto = require('crypto')
+const jwt = require('jsonwebtoken')
+const knex = require('../db/connection')
 
-const createResetPasswordToken = () => crypto.randomBytes(20).toString('hex')
+const secret = ''
+const db = knex('users')
+
+const createResetPasswordToken = () => Crypto.randomBytes(20).toString('hex')
 
 const updateResetPasswordToken = async (email, token) => {
   try {
-    let result = await knex('users')
-    .where('email', email)
-    .update({
+    // let result = await knex('users')
+    //   .where('email', email)
+    //   .update({
+    //     resetPasswordToken: token,
+    //     resetPasswordExpires: Date.now() + 3600000 // 1 hour
+    //   })
+    const update = withUpdate({
       resetPasswordToken: token,
       resetPasswordExpires: Date.now() + 3600000 // 1 hour
     })
-    .returning('*')
+    const where = withWhere('email', email)
+    const result = await update(where(db))
     return result
   } catch (error) {
     throw error
@@ -23,17 +34,32 @@ const updateResetPasswordToken = async (email, token) => {
 
 const hashPassword = async (password) => {
   try {
-    const salt = await bcrypt.genSalt()
-    let hash = await bcrypt.hash(password, salt)
+    const salt = await Bcrypt.genSalt()
+    let hash = await Bcrypt.hash(password, salt)
     return hash
   } catch (error) {
     throw error
   }
 }
 
-const verifyUniqueUser = async (username, email) => {
+const createToken = ({ id, username, guid }) => {
+  return jwt.sign(
+    {
+      id: id,
+      username: username,
+      scope: guid
+    },
+    secret,
+    {
+      algorithm: 'HS256',
+      expiresIn: '1h'
+    }
+  )
+}
+
+const findByUsernameOrEmail = async (username, email) => {
   try {
-    let result = await knex('users')
+    let user = await knex('users')
       .modify(function (queryBuilder) {
         if (!_.isUndefined(username) && !_.isUndefined(email)) {
           queryBuilder.where('username', username).orWhere('email', email)
@@ -44,101 +70,161 @@ const verifyUniqueUser = async (username, email) => {
             queryBuilder.where('email', email)
           }
         }
-      })
-      .first()
-    return result
+      }).first()
+    return user
   } catch (error) {
     throw error
   }
 }
 
-const verifyCredentials = async (username, email, password) => {
+const verifyUniqueUser = async (request, h) => {
   try {
-    let user = await verifyUniqueUser(username, email)
-    if (!user) {
-      throw Boom.unauthorized('Invalid username or email')
+    const { username, email } = request.payload
+    let user = await findByUsernameOrEmail(username, email)
+    if (user) {
+      if (_.isEqual(_.pick(user, 'email'), email)) {
+        return Boom.badRequest('Email taken')
+      }
+      if (_.isEqual(_.pick(user, 'username'), username)) {
+        return Boom.badRequest('Username taken')
+      }
     }
-    let isValid = await bcrypt.compare(password, user.password)
+
+    return h.response(request.payload).code(200)
+  } catch (error) {
+    return Boom.badRequest(error)
+  }
+}
+
+const verifyCredentials = async (request, h) => {
+  try {
+    const { username, email, password } = request.payload
+    let user = await findByUsernameOrEmail(username, email)
+    if (!user) {
+      throw Boom.badRequest('Invalid username or email')
+    }
+    let isValid = await Bcrypt.compare(password, user.password)
     if (!isValid) {
-      throw Boom.unauthorized('Invalid password')
+      throw Boom.badRequest('Invalid password')
     }
-    return user
+    return h.response(user)
   } catch (error) {
     throw error
   }
 }
 
-const verifyResetPassword = async (token) => {
+const getUsers = async (req, h) => {
   try {
-    let user = await knex('users')
-      .where('resetPasswordToken', token)
-      .andWhere('resetPasswordExpires', '>', Date.now())
-      .first()
-    if (!user) {
-      throw Boom.notFound('Password reset token is invalid or has expired')
-    }
-    return user
-  } catch (error) {
-    throw error
-  }
-}
-
-const create = async (req, h) => {
-  try {
-    const { username, email, password } = req.payload
-    let uniqueUser = await verifyUniqueUser(username, password)
-    if (uniqueUser) {
-      throw Boom.badData('Username Or Email taken')
-    }
-    let hash = await hashPassword(password)
-    let result = await knex('users')
-      .insert({
-        username,
-        email,
-        password: hash
-      })
-      .returning('*')
+    const { limit, offset } = req.params
+    const select = withSelect(['id', 'email', 'guid', 'username', 'fullname', 'address', 'mobile', 'created_at'])
+    const limitBy = withLimit(limit)
+    const offsetBy = withOffset(offset)
+    let result = await select(limitBy(offsetBy(db)))
     return h.response(result).code(200)
   } catch (error) {
     return Boom.badRequest(error)
   }
 }
 
-const authenticate = async (req, h) => {
+const createUser = async (req, h) => {
   try {
     const { username, email, password } = req.payload
-    let user = await verifyCredentials(username, email, password)
-    if (!user) {
-      throw Boom.notFound('User not found')
-    }
-    return h.response(user)
+    let hash = await hashPassword(password)
+    let guid = GUID.v4()
+    // let result = await knex('users')
+    //   .returning(['id', 'email', 'guid', 'username'])
+    //   .insert({
+    //     username,
+    //     email,
+    //     password: hash,
+    //     guid: guid
+    //   })
+    const returning = withReturning(['id', 'email', 'guid', 'username'])
+    const insert = withInsert({
+      username,
+      email,
+      password: hash,
+      guid: guid
+    })
+    let result = await returning(insert(db))
+    return h.response({result: _.isEqual(result.length, 1)}).code(200)
   } catch (error) {
     return Boom.badRequest(error)
   }
+}
+
+const getUser = async (req, h) => {
+  try {
+    const { guid } = req.params
+    const first = withFirst(['id', 'email', 'guid', 'username'])
+    const where = withWhere('guid', guid)
+    let user = await first(where(db))
+    return h.response(user).code(200)
+  } catch (error) {
+    return Boom.badRequest(error)
+  }
+}
+
+const updateUser = async (req, h) => {
+  try {
+    const { guid } = req.params
+    const where = withWhere('guid', guid)
+    const update = withUpdate(req.payload)
+    let result = await update(where(db))
+    return h.response({ result: _.isEqual(result, 1) }).code(200)
+  } catch (error) {
+    return Boom.badRequest(error)
+  }
+}
+
+const deleteUser = async (req, h) => {
+  try {
+    const { guid } = req.params
+    const where = withWhere('guid', guid)
+    let result = await where(db).del()
+    // let result = await knex('users')
+    //   .where('guid', guid)
+    //   .del()
+    return h.response({ result: _.isEqual(result, 1) }).code(200)
+  } catch (error) {
+    return Boom.badRequest(error)
+  }
+}
+
+const authenticate = (request, h) => {
+  let token = createToken(request.pre.user)
+  if (token) {
+    return h.response(token).code(200)
+  }
+  return Boom.unauthorized('Incorrect username or email')
 }
 
 const forgotPassword = async (req, h) => {
   try {
     const { email } = req.payload
-    let user = await verifyUniqueUser(undefined, email)
+    let user = await findByUsernameOrEmail(undefined, email)
     if (!user) {
       throw Boom.notFound('User not found')
     }
     let resetToken = createResetPasswordToken()
     let result = await updateResetPasswordToken(email, resetToken)
-    return h.response(result)
+    return h.response({ result: _.isEqual(result, 1) }).code(200)
   } catch (error) {
     return Boom.badRequest(error)
   }
 }
 
-const checkResetPasswordToken = async (req, h) => {
+const verifyResetPasswordToken = async (req, h) => {
   try {
     const { token } = req.params
-    let user = await knex('users')
-      .where('resetPasswordToken', token)
-      .andWhere('resetPasswordExpires', '>', Date.now())
-      .first()
+    // let user = await knex('users')
+    //   .where('resetPasswordToken', token)
+    //   .andWhere('resetPasswordExpires', '>', Date.now())
+    //   .first('id', 'email', 'guid', 'username')
+    const first = withFirst(['id', 'email', 'guid', 'username'])
+    const andWhere = withWhere('resetPasswordExpires', Date.now(), '>')
+    const where = withWhere('resetPasswordToken', token)
+    let user = await first(andWhere(where(db)))
     if (!user) {
       throw Boom.notFound('Password reset token is invalid or has expired')
     }
@@ -150,28 +236,41 @@ const checkResetPasswordToken = async (req, h) => {
 
 const resetPassword = async (req, h) => {
   try {
-    const { token, password } = req.payload
-    let user = await verifyResetPassword(token)
+    const { password } = req.payload
+    const { email } = req.pre.user
+
     let pwd = await hashPassword(password)
 
-    let result = await knex('users')
-      .where('email', user.email)
-      .update({
-        password: pwd,
-        resetPasswordToken: null,
-        resetPasswordExpires: null
-      })
-      .returning('*')
-    return h.response(result).code(200)
+    // let result = await knex('users')
+    //   .where('email', email)
+    //   .update({
+    //     password: pwd,
+    //     resetPasswordToken: null,
+    //     resetPasswordExpires: null
+    //   })
+    const update = withUpdate({
+      password: pwd,
+      resetPasswordToken: null,
+      resetPasswordExpires: null
+    })
+    const where = withWhere('email', email)
+    let result = await update(where(db))
+    return h.response({ result: _.isEqual(result, 1) }).code(200)
   } catch (error) {
     return Boom.badRequest(error)
   }
 }
 
 module.exports = {
-  create,
   authenticate,
+  createUser,
+  deleteUser,
   forgotPassword,
-  checkResetPasswordToken,
-  resetPassword
+  getUser,
+  getUsers,
+  resetPassword,
+  updateUser,
+  verifyCredentials,
+  verifyResetPasswordToken,
+  verifyUniqueUser
 }

@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs')
+const GUID = require('node-uuid')
 
 exports.seed = (knex, Promise) => {
   return knex('users').del()
@@ -9,7 +10,8 @@ exports.seed = (knex, Promise) => {
       knex('users').insert({
         username: 'congbh',
         email: 'bachhungcong@gmail.com',
-        password: hash
+        password: hash,
+        guid: GUID.v4()
       }) // eslint-disable-line
     )
   })
