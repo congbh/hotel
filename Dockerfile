@@ -8,8 +8,8 @@ WORKDIR /usr/src
 ENV PATH /usr/src/node_modules/.bin:$PATH
 
 COPY ["package.json", "package-lock.json*", "./"]
-RUN npm install --silent
+RUN npm install --production
 # COPY . /usr/app
-COPY ./src ./usr/src
+# COPY ./src ./usr/src
 
 CMD ["npm", "start"]

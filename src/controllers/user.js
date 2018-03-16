@@ -1,22 +1,31 @@
+const { withFirst, withInsert, withLimit, withOffset, withSelect, withReturning, withUpdate, withWhere } = require('./_hocHelpers')
 const Boom = require('Boom')
-const bcrypt = require('bcryptjs')
-const knex = require('../db/connection')
+const GUID = require('node-uuid')
 const _ = require('lodash')
-const crypto = require('crypto')
+const Bcrypt = require('bcryptjs')
+const Crypto = require('crypto')
 const jwt = require('jsonwebtoken')
+const knex = require('../db/connection')
 
 const secret = ''
+const db = knex('users')
 
-const createResetPasswordToken = () => crypto.randomBytes(20).toString('hex')
+const createResetPasswordToken = () => Crypto.randomBytes(20).toString('hex')
 
 const updateResetPasswordToken = async (email, token) => {
   try {
-    let result = await knex('users')
-      .where('email', email)
-      .update({
-        resetPasswordToken: token,
-        resetPasswordExpires: Date.now() + 3600000 // 1 hour
-      })
+    // let result = await knex('users')
+    //   .where('email', email)
+    //   .update({
+    //     resetPasswordToken: token,
+    //     resetPasswordExpires: Date.now() + 3600000 // 1 hour
+    //   })
+    const update = withUpdate({
+      resetPasswordToken: token,
+      resetPasswordExpires: Date.now() + 3600000 // 1 hour
+    })
+    const where = withWhere('email', email)
+    const result = await update(where(db))
     return result
   } catch (error) {
     throw error
@@ -25,8 +34,8 @@ const updateResetPasswordToken = async (email, token) => {
 
 const hashPassword = async (password) => {
   try {
-    const salt = await bcrypt.genSalt()
-    let hash = await bcrypt.hash(password, salt)
+    const salt = await Bcrypt.genSalt()
+    let hash = await Bcrypt.hash(password, salt)
     return hash
   } catch (error) {
     throw error
@@ -94,7 +103,7 @@ const verifyCredentials = async (request, h) => {
     if (!user) {
       throw Boom.badRequest('Invalid username or email')
     }
-    let isValid = await bcrypt.compare(password, user.password)
+    let isValid = await Bcrypt.compare(password, user.password)
     if (!isValid) {
       throw Boom.badRequest('Invalid password')
     }
@@ -104,18 +113,41 @@ const verifyCredentials = async (request, h) => {
   }
 }
 
+const getUsers = async (req, h) => {
+  try {
+    const { limit, offset } = req.params
+    const select = withSelect(['id', 'email', 'guid', 'username', 'fullname', 'address', 'mobile', 'created_at'])
+    const limitBy = withLimit(limit)
+    const offsetBy = withOffset(offset)
+    let result = await select(limitBy(offsetBy(db)))
+    return h.response(result).code(200)
+  } catch (error) {
+    return Boom.badRequest(error)
+  }
+}
+
 const createUser = async (req, h) => {
   try {
     const { username, email, password } = req.payload
     let hash = await hashPassword(password)
-    let result = await knex('users')
-      .insert({
-        username,
-        email,
-        password: hash
-      })
-      .returning(['id', 'email', 'guid', 'username'])
-    return h.response(result).code(200)
+    let guid = GUID.v4()
+    // let result = await knex('users')
+    //   .returning(['id', 'email', 'guid', 'username'])
+    //   .insert({
+    //     username,
+    //     email,
+    //     password: hash,
+    //     guid: guid
+    //   })
+    const returning = withReturning(['id', 'email', 'guid', 'username'])
+    const insert = withInsert({
+      username,
+      email,
+      password: hash,
+      guid: guid
+    })
+    let result = await returning(insert(db))
+    return h.response({result: _.isEqual(result.length, 1)}).code(200)
   } catch (error) {
     return Boom.badRequest(error)
   }
@@ -124,10 +156,10 @@ const createUser = async (req, h) => {
 const getUser = async (req, h) => {
   try {
     const { guid } = req.params
-    let result = await knex('users')
-      .where('guid', guid)
-      .returning(['id', 'email', 'guid', 'username'])
-    return h.response(result).code(200)
+    const first = withFirst(['id', 'email', 'guid', 'username'])
+    const where = withWhere('guid', guid)
+    let user = await first(where(db))
+    return h.response(user).code(200)
   } catch (error) {
     return Boom.badRequest(error)
   }
@@ -136,16 +168,10 @@ const getUser = async (req, h) => {
 const updateUser = async (req, h) => {
   try {
     const { guid } = req.params
-    const { user: { firstname, lastname, mobile, address } } = req.payload
-    let result = await knex('users')
-      .where('guid', guid)
-      .update({
-        firstname: firstname,
-        lastname: lastname,
-        mobile: mobile,
-        address: address
-      })
-    return h.response(result).code(200)
+    const where = withWhere('guid', guid)
+    const update = withUpdate(req.payload)
+    let result = await update(where(db))
+    return h.response({ result: _.isEqual(result, 1) }).code(200)
   } catch (error) {
     return Boom.badRequest(error)
   }
@@ -154,10 +180,12 @@ const updateUser = async (req, h) => {
 const deleteUser = async (req, h) => {
   try {
     const { guid } = req.params
-    let result = await knex('users')
-      .where('guid', guid)
-      .del()
-    return h.response(result).code(200)
+    const where = withWhere('guid', guid)
+    let result = await where(db).del()
+    // let result = await knex('users')
+    //   .where('guid', guid)
+    //   .del()
+    return h.response({ result: _.isEqual(result, 1) }).code(200)
   } catch (error) {
     return Boom.badRequest(error)
   }
@@ -180,7 +208,7 @@ const forgotPassword = async (req, h) => {
     }
     let resetToken = createResetPasswordToken()
     let result = await updateResetPasswordToken(email, resetToken)
-    return h.response(result)
+    return h.response({ result: _.isEqual(result, 1) }).code(200)
   } catch (error) {
     return Boom.badRequest(error)
   }
@@ -189,10 +217,14 @@ const forgotPassword = async (req, h) => {
 const verifyResetPasswordToken = async (req, h) => {
   try {
     const { token } = req.params
-    let user = await knex('users')
-      .where('resetPasswordToken', token)
-      .andWhere('resetPasswordExpires', '>', Date.now())
-      .first('id', 'email', 'guid', 'username')
+    // let user = await knex('users')
+    //   .where('resetPasswordToken', token)
+    //   .andWhere('resetPasswordExpires', '>', Date.now())
+    //   .first('id', 'email', 'guid', 'username')
+    const first = withFirst(['id', 'email', 'guid', 'username'])
+    const andWhere = withWhere('resetPasswordExpires', Date.now(), '>')
+    const where = withWhere('resetPasswordToken', token)
+    let user = await first(andWhere(where(db)))
     if (!user) {
       throw Boom.notFound('Password reset token is invalid or has expired')
     }
@@ -209,14 +241,21 @@ const resetPassword = async (req, h) => {
 
     let pwd = await hashPassword(password)
 
-    let result = await knex('users')
-      .where('email', email)
-      .update({
-        password: pwd,
-        resetPasswordToken: null,
-        resetPasswordExpires: null
-      })
-    return h.response(result).code(200)
+    // let result = await knex('users')
+    //   .where('email', email)
+    //   .update({
+    //     password: pwd,
+    //     resetPasswordToken: null,
+    //     resetPasswordExpires: null
+    //   })
+    const update = withUpdate({
+      password: pwd,
+      resetPasswordToken: null,
+      resetPasswordExpires: null
+    })
+    const where = withWhere('email', email)
+    let result = await update(where(db))
+    return h.response({ result: _.isEqual(result, 1) }).code(200)
   } catch (error) {
     return Boom.badRequest(error)
   }
@@ -228,6 +267,7 @@ module.exports = {
   deleteUser,
   forgotPassword,
   getUser,
+  getUsers,
   resetPassword,
   updateUser,
   verifyCredentials,

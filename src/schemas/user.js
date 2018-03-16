@@ -1,42 +1,43 @@
-'use strict'
 const Joi = require('joi')
 
-module.exports.Error = Joi.object({
-  error: {
-    msg: Joi.string().min(3).description('Human readable error').default('An error has occurred.'),
-    type: Joi.string().min(3).description('Type of error').default('GENERIC_ERR')
-  }
-}).label('Error')
+module.exports = require('./generic')
 
-module.exports.User = {
+module.exports.GetUsersQuerySchema = Joi.object({
+  limit: Joi.number().integer().min(1).max(100).default(10),
+  offset: Joi.number().integer().default(0)
+})
+
+module.exports.UsersResponseSchema = Joi.array().items({
   id: Joi.number(),
   guid: Joi.string().guid(),
   username: Joi.string(),
-  password: Joi.string(),
   email: Joi.string().email(),
-  lastname: Joi.string(),
-  firstname: Joi.string(),
-  address: Joi.string(),
-  mobile: Joi.string(),
-  created_at: Joi.date(),
-  resetPasswordToken: Joi.string().allow(null),
-  resetPasswordExpires: Joi.number().allow(null)
-}
+  fullname: Joi.string().allow(null),
+  address: Joi.string().allow(null),
+  mobile: Joi.string().allow(null),
+  created_at: Joi.date()
+})
 
 module.exports.DeleteUserSchema = Joi.object({
   guid: Joi.string().guid().required()
 })
 
 module.exports.DeleteUserResponseSchema = Joi.object({
-  result: Joi.number()
+  result: Joi.bool()
 }).label('Response')
 
-module.exports.UpdateUserSchema = Joi.object({
+module.exports.UpdateUserParamSchema = Joi.object({
   guid: Joi.string().guid().required()
 })
 
+module.exports.UpdateUserPayloadSchema = Joi.object({
+  address: Joi.string().allow(null),
+  fullname: Joi.string().allow(null),
+  mobile: Joi.string().allow(null)
+})
+
 module.exports.UpdateUserResponseSchema = Joi.object({
-  result: Joi.number()
+  result: Joi.bool()
 }).label('Response')
 
 module.exports.GetUserSchema = Joi.object({
@@ -57,10 +58,7 @@ module.exports.CreateUserSchema = Joi.object({
 })
 
 module.exports.CreateUserResponseSchema = Joi.object({
-  id: Joi.number().required(),
-  email: Joi.string().email().required(),
-  guid: Joi.string().guid().required(),
-  username: Joi.string().required()
+  result: Joi.bool()
 }).label('Response')
 
 module.exports.ResetPasswordSchema = Joi.object({
@@ -69,8 +67,7 @@ module.exports.ResetPasswordSchema = Joi.object({
 })
 
 module.exports.ResetPasswordResponseSchema = Joi.object({
-  token: Joi.string().required(),
-  email: Joi.string().email().required()
+  result: Joi.bool()
 }).label('Response')
 
 module.exports.VerifyResetPasswordTokenResponseSchema = Joi.object({

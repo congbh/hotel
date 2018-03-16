@@ -11,3 +11,8 @@
     2. npm run dev:build - To build docker
     3. npm run dev:up - To up docker
     4. npm run dev:migrate - To migrate postgres
+
+# Delete all containers
+docker rm $(docker ps -a -q)
+# Delete all images
+docker rmi $(docker images -q)

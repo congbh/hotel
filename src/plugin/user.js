@@ -6,6 +6,7 @@ const {
   deleteUser,
   forgotPassword,
   getUser,
+  getUsers,
   resetPassword,
   updateUser,
   verifyCredentials,
@@ -25,6 +26,37 @@ async function register (server, options) {
   })
 
   server.route({
+    method: 'GET',
+    path: '/users',
+    handler: getUsers,
+    options: {
+      plugins: {
+        'hapi-swagger': {
+          responses: {
+            '200': {
+              description: SCHEMAS.Messages.Success,
+              schema: SCHEMAS.UsersResponseSchema
+            },
+            '400': {
+              description: SCHEMAS.Messages.BadRequest,
+              schema: SCHEMAS.Error
+            }
+          },
+          security: {}
+        }
+      },
+      tags: ['api'],
+      validate: {
+        query: SCHEMAS.GetUsersQuerySchema
+      },
+      response: {
+        schema: SCHEMAS.UsersResponseSchema
+      },
+      description: 'Get all users'
+    }
+  })
+
+  server.route({
     method: 'POST',
     path: '/users',
     handler: createUser,
@@ -36,11 +68,11 @@ async function register (server, options) {
         'hapi-swagger': {
           responses: {
             '200': {
-              description: 'Success',
+              description: SCHEMAS.Messages.Success,
               schema: SCHEMAS.CreateUserResponseSchema
             },
             '400': {
-              description: 'Bad Request',
+              description: SCHEMAS.Messages.BadRequest,
               schema: SCHEMAS.Error
             }
           },
@@ -53,7 +85,8 @@ async function register (server, options) {
       },
       response: {
         schema: SCHEMAS.CreateUserResponseSchema
-      }
+      },
+      description: 'Create new user'
     }
   })
 
@@ -62,15 +95,16 @@ async function register (server, options) {
     path: '/users/{guid}',
     handler: getUser,
     options: {
+      description: 'Get user by uid',
       plugins: {
         'hapi-swagger': {
           responses: {
             '200': {
-              description: 'Success',
+              description: SCHEMAS.Messages.Success,
               schema: SCHEMAS.GetUserResponseSchema
             },
             '400': {
-              description: 'Bad Request',
+              description: SCHEMAS.Messages.BadRequest,
               schema: SCHEMAS.Error
             }
           },
@@ -92,6 +126,7 @@ async function register (server, options) {
     path: '/users/{guid}',
     handler: updateUser,
     options: {
+      description: 'Update user by uid',
       pre: [
         { method: getUser, assign: 'user' }
       ],
@@ -99,11 +134,11 @@ async function register (server, options) {
         'hapi-swagger': {
           responses: {
             '200': {
-              description: 'Success',
+              description: SCHEMAS.Messages.Success,
               schema: SCHEMAS.UpdateUserResponseSchema
             },
             '400': {
-              description: 'Bad Request',
+              description: SCHEMAS.Messages.BadRequest,
               schema: SCHEMAS.Error
             }
           },
@@ -112,7 +147,8 @@ async function register (server, options) {
       },
       tags: ['api'],
       validate: {
-        params: SCHEMAS.UpdateUserSchema
+        params: SCHEMAS.UpdateUserParamSchema,
+        payload: SCHEMAS.UpdateUserPayloadSchema
       },
       response: {
         schema: SCHEMAS.UpdateUserResponseSchema
@@ -125,15 +161,16 @@ async function register (server, options) {
     path: '/users/{guid}',
     handler: deleteUser,
     options: {
+      description: 'Delete user by uid',
       plugins: {
         'hapi-swagger': {
           responses: {
             '200': {
-              description: 'Success',
+              description: SCHEMAS.Messages.Success,
               schema: SCHEMAS.DeleteUserResponseSchema
             },
             '400': {
-              description: 'Bad Request',
+              description: SCHEMAS.Messages.BadRequest,
               schema: SCHEMAS.Error
             }
           },
@@ -155,6 +192,7 @@ async function register (server, options) {
     path: '/users/auth',
     handler: authenticate,
     options: {
+      description: 'Authentication user',
       pre: [
         { method: verifyCredentials, assign: 'user' }
       ],
@@ -162,13 +200,13 @@ async function register (server, options) {
         'hapi-swagger': {
           responses: {
             '200': {
-              description: 'Success',
+              description: SCHEMAS.Messages.Success,
               schema: Joi.object({
                 token: Joi.string().required()
               }).label('Response')
             },
             '400': {
-              description: 'Bad Request',
+              description: SCHEMAS.Messages.BadRequest,
               schema: SCHEMAS.Error
             }
           },
@@ -192,17 +230,18 @@ async function register (server, options) {
     path: '/users/forgot-password',
     handler: forgotPassword,
     options: {
+      description: 'Fotgot password',
       plugins: {
         'hapi-swagger': {
           responses: {
             '200': {
-              description: 'Success',
+              description: SCHEMAS.Messages.Success,
               schema: Joi.object({
-                result: Joi.number()
+                result: Joi.bool()
               }).label('Response')
             },
             '400': {
-              description: 'Bad Request',
+              description: SCHEMAS.Messages.BadRequest,
               schema: SCHEMAS.Error
             }
           },
@@ -217,7 +256,7 @@ async function register (server, options) {
       },
       response: {
         schema: Joi.object({
-          result: Joi.number()
+          result: Joi.bool()
         }).label('Response')
       }
     }
@@ -225,18 +264,18 @@ async function register (server, options) {
 
   server.route({
     method: 'GET',
-    path: '/users/verify-reset-password-token',
+    path: '/users/verify-reset-password-token/{token}',
     handler: verifyResetPasswordToken,
     options: {
       plugins: {
         'hapi-swagger': {
           responses: {
             '200': {
-              description: 'Success',
+              description: SCHEMAS.Messages.Success,
               schema: SCHEMAS.VerifyResetPasswordTokenResponseSchema
             },
             '400': {
-              description: 'Bad Request',
+              description: SCHEMAS.Messages.BadRequest,
               schema: SCHEMAS.Error
             }
           },
@@ -246,7 +285,7 @@ async function register (server, options) {
       tags: ['api'],
       validate: {
         params: {
-          token: Joi.string().required()
+          token: Joi.string()
         }
       },
       response: {
@@ -267,11 +306,11 @@ async function register (server, options) {
         'hapi-swagger': {
           responses: {
             '200': {
-              description: 'Success',
+              description: SCHEMAS.Messages.Success,
               schema: SCHEMAS.ResetPasswordResponseSchema
             },
             '400': {
-              description: 'Bad Request',
+              description: SCHEMAS.Messages.BadRequest,
               schema: SCHEMAS.Error
             }
           },

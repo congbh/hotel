@@ -24,15 +24,16 @@ const init = async () => {
         version: Pack.version
       },
       swaggerUI: true,
-      basePath: '/docs',
+      basePath: '/api/v1',
       pathPrefixSize: 2,
-      jsonPath: '/docs/swagger.json',
+      jsonEditor: true,
+      // jsonPath: '/docs/swagger.json',
       sortPaths: 'path-method',
       lang: 'en',
       tags: [
         { name: 'api' }
       ],
-      documentationPath: '/',
+      documentationPath: '/docs',
       securityDefinitions: {}
     }
   }

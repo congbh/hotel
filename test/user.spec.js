@@ -1,10 +1,7 @@
 const Lab = require('lab')
 const lab = exports.lab = Lab.script()
 const { expect } = require('code')
-// const Server = require('../src/server.js')
-// const knex = require('../src/db/connection')
-var request = require('request')
-
+const Wreck = require('wreck')
 const describe = lab.describe
 const it = lab.it
 // const before = lab.before
@@ -12,17 +9,38 @@ const it = lab.it
 const BASE_API_URL = 'http://localhost:3000'
 describe('Testing user api', () => {
   // it('should create user', async () => {
-  //   request.post({
-  //     url: 'http://localhost:3000/users',
-  //     formData: {
-  //       username: 'aaa',
-  //       email: 'aaa@gmail.com',
-  //       password: 'aaa'
+  //   const { res, payload } = await Wreck.post(`${BASE_API_URL}/users`, {
+  //     payload: {
+  //       username: 'name',
+  //       email: 'name@gmail.com',
+  //       password: 'name'
   //     }
-  //   }, function (err, res) {
-  //     expect(err).to.not.exist()
-  //     expect(res.statusCode).to.equal(200)
   //   })
+  //   expect(res.statusCode).to.equal(200)
+  //   expect(JSON.parse(payload.toString()).result).to.be.true()
+  // })
+
+  // it('should get a user', async () => {
+  //   const { payload } = await Wreck.get(`${BASE_API_URL}/users/0788b7bf-65f6-4740-a5e4-c937187b0556`)
+  //   expect(payload).to.be.exist()
+  // })
+
+  it('should get users', async () => {
+    const { payload } = await Wreck.get(`${BASE_API_URL}/users`)
+    // console.log(JSON.parse(payload.toString()))
+    expect(JSON.parse(payload.toString()).length).to.be.greaterThan(0)
+  })
+
+  // it('should update a user', async () => {
+  //   const { res, payload } = await Wreck.put(`${BASE_API_URL}/users/0788b7bf-65f6-4740-a5e4-c937187b0556`, {
+  //     payload: {
+  //       fullname: 'Bach Hung Cong',
+  //       mobile: '0985025889',
+  //       address: '16 An Duong Vuong'
+  //     }
+  //   })
+  //   expect(res.statusCode).to.equal(200)
+  //   expect(JSON.parse(payload.toString()).result).to.be.true()
   // })
 
   // it('should check unique user', async () => {
@@ -40,17 +58,17 @@ describe('Testing user api', () => {
   //   })
   // })
 
-  it('should authenticate user', async () => {
-    request.post({
-      url: `${BASE_API_URL}/users/authenticate`,
-      json: true,
-      formData: {
-        email: 'aaa@gmail.com',
-        password: 'aaa'
-      }
-    }, function (err, res, body) {
-      expect(err).to.not.exist()
-      expect(body).to.be.exist()
-    })
-  })
+  // it('should authenticate user', async () => {
+  //   request.post({
+  //     url: `${BASE_API_URL}/users/authenticate`,
+  //     json: true,
+  //     formData: {
+  //       email: 'aaa@gmail.com',
+  //       password: 'aaa'
+  //     }
+  //   }, function (err, res, body) {
+  //     expect(err).to.not.exist()
+  //     expect(body).to.be.exist()
+  //   })
+  // })
 })
