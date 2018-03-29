@@ -1,0 +1,19 @@
+{
+    "plugins": [
+        [
+            "module-resolver",
+            {
+                "cwd": "babelrc",
+                "root": [
+                    "./"
+                ],
+                "alias": {
+                    "src": "./src"
+                }
+            }
+        ],
+        "transform-decorators-legacy",
+        "transform-export-extensions",
+        "transform-class-properties"
+    ]
+}

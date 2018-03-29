@@ -4,6 +4,8 @@ services:
   postgres-db:
     container_name: postgres-db
     build: ./src/db
+    volumes:
+      - ./database:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: OoMUDgwLGG
@@ -18,11 +20,6 @@ services:
     volumes:
       - .:/usr/src
       - ./package.json:/usr/src/package.json
-    # labels:
-    #   - "traefik.backend=api"
-    #   - "traefik.frontend.rule=PathPrefix: /api"
-    #   - "traefik.port=8789"
-    #   - "traefik.frontend.entryPoints=http"
     ports:
       - "3000:3000"
     environment:
@@ -37,13 +34,4 @@ services:
         condition: service_healthy
     links:
       - postgres-db
-
-  # traefik:
-  #   image: traefik
-  #   command: --web --docker --docker.domain=docker.localhost --logLevel=DEBUG
-  #   ports:
-  #     - "3000:80"
-  #     - "3001:8080"
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - /dev/null:/traefik.toml
+    # command: ["./wait-for-postgres.sh", "db", "python", "app.py"]
