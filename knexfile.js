@@ -5,7 +5,7 @@ const path = require('path')
 module.exports = {
   development: {
     client: 'pg',
-    connection: process.env.DATABASE_URL || 'postgres://postgres:OoMUDgwLGG@postgres-db:5432/hotel_dev',
+    connection: process.env.DATABASE_URL,
     migrations: {
       directory: path.join(__dirname, 'src', 'db', 'migrations')
     },
@@ -15,7 +15,8 @@ module.exports = {
   },
   test: {
     client: 'pg',
-    connection: process.env.DATABASE_TEST_URL || 'postgres://postgres:OoMUDgwLGG@postgres-db:5432/hotel_test',
+    connection: process.env.DATABASE_TEST_URL || 'postgres://postgres:OoMUDgwLGG@localhost:5433/hotel_test',
+    // debug: true,
     migrations: {
       directory: path.join(__dirname, 'src', 'db', 'migrations')
     },

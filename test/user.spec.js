@@ -1,12 +1,14 @@
 const Lab = require('lab')
 const lab = exports.lab = Lab.script()
 const { expect } = require('code')
-const Wreck = require('wreck')
+// const Wreck = require('wreck')
 const describe = lab.describe
 const it = lab.it
+const {Server} = require('../src/server.js')
+const { API: { API_PATH } } = require('../src/config')
 // const before = lab.before
 // const after = lab.after
-const BASE_API_URL = 'http://localhost:3000'
+// const BASE_API_URL = 'http://localhost:3000'
 describe('Testing user api', () => {
   // it('should create user', async () => {
   //   const { res, payload } = await Wreck.post(`${BASE_API_URL}/users`, {
@@ -25,11 +27,10 @@ describe('Testing user api', () => {
   //   expect(payload).to.be.exist()
   // })
 
-  it('should get users', async () => {
-    const { payload } = await Wreck.get(`${BASE_API_URL}/users`)
-    // console.log(JSON.parse(payload.toString()))
-    expect(JSON.parse(payload.toString()).length).to.be.greaterThan(0)
-  })
+  // it('should get users', async () => {
+  //   const { payload } = await Wreck.get(`${BASE_API_URL}/users`)
+  //   expect(JSON.parse(payload.toString()).length).to.be.greaterThan(0)
+  // })
 
   // it('should update a user', async () => {
   //   const { res, payload } = await Wreck.put(`${BASE_API_URL}/users/0788b7bf-65f6-4740-a5e4-c937187b0556`, {
@@ -71,4 +72,37 @@ describe('Testing user api', () => {
   //     expect(body).to.be.exist()
   //   })
   // })
+
+  // it('should create user', async () => {
+  //   const response = await Server.inject({
+  //     method: 'POST',
+  //     url: '/users',
+  //     payload: {
+  //       username: 'name',
+  //       email: 'name@gmail.com',
+  //       password: 'name'
+  //     }
+  //   })
+  //   console.log(response.result)
+  //   expect(response.statusCode).to.equal(200)
+  //   expect(response.result).to.be.exists()
+  // })
+  it('should get list user', async () => {
+    const response = await Server.inject({
+      method: 'GET',
+      url: API_PATH + '/users?filter={}&limit=10&offset=0'
+    })
+    expect(response.statusCode).to.equal(200)
+    expect(response.result.length).to.be.greaterThan(0)
+  })
+  it('should return error when create user', async () => {
+    const response = await Server.inject({
+      method: 'POST',
+      url: `${API_PATH}/users`,
+      payload: {
+        username: 'cong'
+      }
+    })
+    expect(response.statusCode).to.equal(400)
+  })
 })
