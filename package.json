@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Hotel api gateway",
   "scripts": {
-    "start": "gulp --gulpfile gulpfile.js",
-    "start:prod": "cross-env NODE_ENV=production node ./src/server.js",
+    "start": "cross-env NODE_ENV=production node ./src/server.js",
+    "start:dev": "gulp --gulpfile gulpfile.js",
     "lint:fix": "eslint ./ --fix",
     "test": "lab -v -L -C -c -t 85",
     "test-cov-html": "lab -r html -o coverage.html",
