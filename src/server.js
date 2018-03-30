@@ -65,7 +65,8 @@ container.register({
 })
 
 const server = Hapi.server({
-  port: process.env.API_PORT || 8080
+  host: process.env.HOST || 'localhost',
+  port: process.env.PORT || 8080
 })
 
 const init = async () => {
