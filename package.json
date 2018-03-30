@@ -22,7 +22,7 @@
     "dev:clean": "docker rmi $(docker images -f \"dangling=true\" -q)"
   },
   "engines": {
-    "npm": ">=5",
+    "npm": ">=3",
     "node": ">=5"
   },
   "author": "Bach Hung Cong",
