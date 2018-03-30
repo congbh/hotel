@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Hotel api gateway",
   "scripts": {
-    "start": "gulp --gulpfile gulpfile.js",
+    "start": "cross-env NODE_ENV=development gulp --gulpfile gulpfile.js",
+    "start:prod": "cross-env NODE_ENV=production gulp --gulpfile gulpfile.js",
     "lint:fix": "eslint ./ --fix",
     "test": "lab -v -L -C -c -t 85",
     "test-cov-html": "lab -r html -o coverage.html",
@@ -48,6 +49,7 @@
     "awilix": "^3.0.6",
     "bcryptjs": "^2.4.3",
     "boom": "^7.2.0",
+    "cross-env": "^5.1.4",
     "dotenv": "^5.0.1",
     "good": "^8.1.1",
     "good-console": "^7.1.0",
