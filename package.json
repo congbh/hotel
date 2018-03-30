@@ -10,6 +10,7 @@
     "test-cov-html": "lab -r html -o coverage.html",
     "dev:migrate": "./migrate-db-dev.sh",
     "test:migrate": "./migrate-db-test.sh",
+    "local:migrate": "./migrate-db-local.sh",
     "dev:start": "./run-dev.sh",
     "dev:db:start": "docker-compose -f docker-compose.yml up -d postgres-db",
     "dev:uninstall": "docker-compose -f docker-compose.yml down --rmi all",

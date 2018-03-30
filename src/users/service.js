@@ -72,8 +72,9 @@ class UserService {
 
   async authenticate (payload) {
     try {
-      const { username, email, password } = payload
+      const { username = '', email = '', password } = payload
       let user = await this._verifyCredentials(username, email, password)
+      console.log('user >>', user)
       let token = this._createToken(user)
       return token
     } catch (error) {
