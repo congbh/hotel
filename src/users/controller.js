@@ -24,7 +24,7 @@ class UserController {
 
   async authenticate (request, h) {
     try {
-      let token = this.userService.authenticate(request.payload)
+      let token = await this.userService.authenticate(request.payload)
       return h.response({ token }).code(200)
     } catch (error) {
       return Boom.badRequest(error)

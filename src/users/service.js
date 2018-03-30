@@ -3,8 +3,7 @@ const Bcrypt = require('bcryptjs')
 const GUID = require('node-uuid')
 const _ = require('lodash')
 const jwt = require('jsonwebtoken')
-
-const secret = ''
+const { API } = require('../config')
 
 class UserService {
   constructor ({ userRepository }) {
@@ -62,7 +61,7 @@ class UserService {
         username: username,
         scope: id
       },
-      secret,
+      API.SECRET_KEY,
       {
         algorithm: 'HS256',
         expiresIn: '1h'
@@ -75,7 +74,6 @@ class UserService {
       const { username = '', email = '', password } = payload
       let user = await this._verifyCredentials(username, email, password)
       let token = this._createToken(user)
-      console.log('token >>', token)
       return token
     } catch (error) {
       throw error

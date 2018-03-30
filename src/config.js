@@ -10,6 +10,7 @@ module.exports = {
     PRICE: 'price'
   },
   API: {
-    API_PATH: '/api/v1'
+    API_PATH: '/api/v1',
+    SECRET_KEY: 'm3n3TphLFwqfHhYS'
   }
 }
