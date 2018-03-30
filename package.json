@@ -20,7 +20,11 @@
     "dev:db:psql": "psql -h localhost -p 5432 -U postgres -d hotel_dev",
     "dev:clean": "docker rmi $(docker images -f \"dangling=true\" -q)"
   },
-  "author": "",
+  "engines": {
+    "npm": ">=5",
+    "node": ">=5"
+  },
+  "author": "Bach Hung Cong",
   "license": "ISC",
   "repository": {
     "type": "git"
