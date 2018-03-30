@@ -10,6 +10,7 @@ gulp.task('start', () => {
   nodemon({
     script: './src/server',
     ext: 'js html',
+    env: { 'NODE_ENV': 'development' },
     tasks: ['lint']
   })
 })
