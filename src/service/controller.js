@@ -1,4 +1,4 @@
-const Boom = require('Boom')
+const Boom = require('boom')
 
 class ServiceController {
   constructor ({ serviceSrv }) {

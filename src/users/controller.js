@@ -1,4 +1,4 @@
-const Boom = require('Boom')
+const Boom = require('boom')
 const Crypto = require('crypto')
 
 // const secret = ''

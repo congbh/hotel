@@ -1,5 +1,5 @@
 
-const Boom = require('Boom')
+const Boom = require('boom')
 const GUID = require('node-uuid')
 
 class FloorController {
