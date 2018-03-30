@@ -74,8 +74,8 @@ class UserService {
     try {
       const { username = '', email = '', password } = payload
       let user = await this._verifyCredentials(username, email, password)
-      console.log('user >>', user)
       let token = this._createToken(user)
+      console.log('token >>', token)
       return token
     } catch (error) {
       throw error
