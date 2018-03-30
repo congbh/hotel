@@ -27,6 +27,9 @@ async function register (server, options) {
         let response = await userController.create(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -70,6 +73,9 @@ async function register (server, options) {
         let response = await userController.delete(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -104,6 +110,9 @@ async function register (server, options) {
         const { pre: { userController } } = request
         let response = await userController.list(request, h)
         return response
+      },
+      cors: {
+        origin: 'ignore'
       },
       plugins: {
         'hapi-swagger': {
@@ -142,6 +151,9 @@ async function register (server, options) {
         let response = await userController.getOne(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -177,6 +189,9 @@ async function register (server, options) {
         const { pre: { userController } } = request
         let response = await userController.update(request, h)
         return response
+      },
+      cors: {
+        origin: 'ignore'
       },
       plugins: {
         'hapi-swagger': {
@@ -215,6 +230,9 @@ async function register (server, options) {
         let response = await userController.authenticate(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -251,6 +269,9 @@ async function register (server, options) {
         let response = await userController.forgotPassword(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -286,6 +307,9 @@ async function register (server, options) {
         let response = await userController.verifyResetPasswordToken(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -320,6 +344,9 @@ async function register (server, options) {
         const { pre: { userController } } = request
         let response = await userController.resetPassword(request, h)
         return response
+      },
+      cors: {
+        origin: 'ignore'
       },
       plugins: {
         'hapi-swagger': {

@@ -5,7 +5,6 @@ const Vision = require('vision')
 const Inert = require('inert')
 const HapiSwagger = require('hapi-swagger')
 const Pack = require('../package.json')
-const corsHeaders = require('hapi-cors-headers')
 const awilix = require('awilix')
 const { awilixHapiPlugin } = require('./plugin/awilix-hapi')
 const connection = require('./db/connection')
@@ -67,8 +66,6 @@ container.register({
 const server = Hapi.server({
   port: process.env.PORT || 8080
 })
-
-server.ext('onPreResponse', corsHeaders)
 
 const init = async () => {
   const HapiSwaggerConfig = {
