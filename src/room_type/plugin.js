@@ -3,7 +3,7 @@ const { API: { API_PATH } } = require('../config')
 const { inject } = require('../plugin/awilix-hapi')
 const SCHEMAS = require('./schema')
 
-async function register (server, options) {
+async function register (server, options) { // eslint-disable-line no-unused-vars
   // create
   server.route({
     method: 'POST',
@@ -14,6 +14,9 @@ async function register (server, options) {
         const { pre: { roomTypeController } } = request
         let response = await roomTypeController.create(request, h)
         return response
+      },
+      cors: {
+        origin: 'ignore'
       },
       plugins: {
         'hapi-swagger': {
@@ -32,7 +35,13 @@ async function register (server, options) {
       },
       tags: ['api', 'room_types'],
       validate: {
-        payload: SCHEMAS.CreateRoomTypeSchema
+        payload: SCHEMAS.CreateRoomTypeSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.CreateRoomTypeResponseSchema
@@ -53,6 +62,9 @@ async function register (server, options) {
         let response = await roomTypeController.delete(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -70,7 +82,13 @@ async function register (server, options) {
       },
       tags: ['api', 'room_types'],
       validate: {
-        params: SCHEMAS.DeleteRoomTypeSchema
+        params: SCHEMAS.DeleteRoomTypeSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.DeleteRoomTypeResponseSchema
@@ -89,6 +107,9 @@ async function register (server, options) {
         let response = await roomTypeController.list(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -106,7 +127,13 @@ async function register (server, options) {
       },
       tags: ['api', 'room_types'],
       validate: {
-        query: SCHEMAS.GetListRoomTypeQuerySchema
+        query: SCHEMAS.GetListRoomTypeQuerySchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.ListRoomTypeResponseSchema
@@ -126,6 +153,9 @@ async function register (server, options) {
         let response = await roomTypeController.get(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -144,7 +174,13 @@ async function register (server, options) {
       pre: [inject('roomTypeController')],
       tags: ['api', 'room_types'],
       validate: {
-        params: SCHEMAS.GetRoomTypeSchema
+        params: SCHEMAS.GetRoomTypeSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.GetRoomTypeResponseSchema
@@ -165,6 +201,9 @@ async function register (server, options) {
         const { pre: { roomTypeController } } = request
         let response = await roomTypeController.update(request, h)
         return response
+      },
+      cors: {
+        origin: 'ignore'
       },
       plugins: {
         'hapi-swagger': {

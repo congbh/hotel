@@ -3,7 +3,7 @@ const { API: { API_PATH } } = require('../config')
 const { inject } = require('../plugin/awilix-hapi')
 const SCHEMAS = require('./schema')
 
-async function register (server, options) {
+async function register (server, options) { // eslint-disable-line no-unused-vars
   // create
   server.route({
     method: 'POST',
@@ -14,6 +14,9 @@ async function register (server, options) {
         const { pre: { floorController } } = request
         let response = await floorController.create(request, h)
         return response
+      },
+      cors: {
+        origin: 'ignore'
       },
       plugins: {
         'hapi-swagger': {
@@ -32,7 +35,13 @@ async function register (server, options) {
       },
       tags: ['api', 'floors'],
       validate: {
-        payload: SCHEMAS.CreateFloorSchema
+        payload: SCHEMAS.CreateFloorSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.CreateFloorResponseSchema
@@ -53,6 +62,9 @@ async function register (server, options) {
         let response = await floorController.delete(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -70,7 +82,13 @@ async function register (server, options) {
       },
       tags: ['api', 'floors'],
       validate: {
-        params: SCHEMAS.DeleteFloorSchema
+        params: SCHEMAS.DeleteFloorSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.DeleteFloorResponseSchema
@@ -89,6 +107,9 @@ async function register (server, options) {
         let response = await floorController.list(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -106,7 +127,13 @@ async function register (server, options) {
       },
       tags: ['api', 'floors'],
       validate: {
-        query: SCHEMAS.GetFloorsQuerySchema
+        query: SCHEMAS.GetFloorsQuerySchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.FloorsResponseSchema
@@ -126,6 +153,9 @@ async function register (server, options) {
         let response = await floorController.getOne(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -144,7 +174,13 @@ async function register (server, options) {
       pre: [inject('floorController')],
       tags: ['api', 'floors'],
       validate: {
-        params: SCHEMAS.GetFloorSchema
+        params: SCHEMAS.GetFloorSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.GetFloorResponseSchema
@@ -165,6 +201,9 @@ async function register (server, options) {
         const { pre: { floorController } } = request
         let response = await floorController.update(request, h)
         return response
+      },
+      cors: {
+        origin: 'ignore'
       },
       plugins: {
         'hapi-swagger': {

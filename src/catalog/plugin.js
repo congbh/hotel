@@ -3,7 +3,7 @@ const SCHEMAS = require('./schema')
 const { inject } = require('../plugin/awilix-hapi')
 const { API: { API_PATH } } = require('../config')
 
-async function register (server, options) {
+async function register (server, options) { // eslint-disable-line no-unused-vars
   // create 
   server.route({
     method: 'POST',
@@ -14,6 +14,9 @@ async function register (server, options) {
         const { pre: { catalogController } } = request
         let response = await catalogController.create(request, h)
         return response
+      },
+      cors: {
+        origin: 'ignore'
       },
       plugins: {
         'hapi-swagger': {
@@ -59,6 +62,9 @@ async function register (server, options) {
         let response = await catalogController.delete(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -100,6 +106,9 @@ async function register (server, options) {
         const { pre: { catalogController } } = request
         let response = await catalogController.list(request, h)
         return response
+      },
+      cors: {
+        origin: 'ignore'
       },
       plugins: {
         'hapi-swagger': {
@@ -145,6 +154,9 @@ async function register (server, options) {
         let response = await catalogController.getOne(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -189,6 +201,9 @@ async function register (server, options) {
         const { pre: { catalogController } } = request
         let response = await catalogController.update(request, h)
         return response
+      },
+      cors: {
+        origin: 'ignore'
       },
       plugins: {
         'hapi-swagger': {

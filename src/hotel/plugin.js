@@ -8,7 +8,7 @@ const pre1 = async function (request, h) {
   return result
 }
 
-async function register (server, options) {
+async function register (server, options) { // eslint-disable-line no-unused-vars
   server.route({
     method: 'GET',
     path: `${API_PATH}/hotels/ping`,
@@ -35,6 +35,9 @@ async function register (server, options) {
         let response = await req.pre.hotelController.create(req, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -52,7 +55,13 @@ async function register (server, options) {
       },
       tags: ['api', 'hotels'],
       validate: {
-        payload: SCHEMAS.CreateHotelSchema
+        payload: SCHEMAS.CreateHotelSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.CreateHotelResponseSchema
@@ -73,6 +82,9 @@ async function register (server, options) {
         let response = await hotelController.delete(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -90,7 +102,13 @@ async function register (server, options) {
       },
       tags: ['api', 'hotels'],
       validate: {
-        params: SCHEMAS.DeleteHotelSchema
+        params: SCHEMAS.DeleteHotelSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.DeleteHotelResponseSchema
@@ -109,6 +127,9 @@ async function register (server, options) {
         let response = await hotelController.list(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -126,7 +147,13 @@ async function register (server, options) {
       },
       tags: ['api', 'hotels'],
       validate: {
-        query: SCHEMAS.GetHotelsQuerySchema
+        query: SCHEMAS.GetHotelsQuerySchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.HotelsResponseSchema
@@ -146,6 +173,9 @@ async function register (server, options) {
     },
     options: {
       description: 'Get hotel by id',
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -164,7 +194,13 @@ async function register (server, options) {
       pre: [inject('hotelController')],
       tags: ['api', 'hotels'],
       validate: {
-        params: SCHEMAS.GetHotelSchema
+        params: SCHEMAS.GetHotelSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.GetHotelResponseSchema
@@ -185,6 +221,9 @@ async function register (server, options) {
         const { pre: { hotelController } } = request
         let response = await hotelController.update(request, h)
         return response
+      },
+      cors: {
+        origin: 'ignore'
       },
       plugins: {
         'hapi-swagger': {

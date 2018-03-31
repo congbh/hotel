@@ -3,8 +3,7 @@ const { API: { API_PATH } } = require('../config')
 const SCHEMAS = require('./schema')
 const { inject } = require('../plugin/awilix-hapi')
 
-async function register (server, options) {
-  // create 
+async function register (server, options) { // eslint-disable-line no-unused-vars
   server.route({
     method: 'POST',
     path: `${API_PATH}/services`,
@@ -14,6 +13,9 @@ async function register (server, options) {
         const { pre: { serviceController } } = request
         let response = await serviceController.create(request, h)
         return response
+      },
+      cors: {
+        origin: 'ignore'
       },
       plugins: {
         'hapi-swagger': {
@@ -32,7 +34,13 @@ async function register (server, options) {
       },
       tags: ['api', 'services'],
       validate: {
-        payload: SCHEMAS.CreateServiceSchema
+        payload: SCHEMAS.CreateServiceSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.CreateServiceResponseSchema
@@ -53,6 +61,9 @@ async function register (server, options) {
         let response = await serviceController.delete(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -70,7 +81,13 @@ async function register (server, options) {
       },
       tags: ['api', 'services'],
       validate: {
-        params: SCHEMAS.DeleteserviceSchema
+        params: SCHEMAS.DeleteserviceSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.DeleteserviceResponseSchema
@@ -89,6 +106,9 @@ async function register (server, options) {
         let response = await serviceController.list(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -106,7 +126,13 @@ async function register (server, options) {
       },
       tags: ['api', 'services'],
       validate: {
-        query: SCHEMAS.GetServicesQuerySchema
+        query: SCHEMAS.GetServicesQuerySchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.ServicesResponseSchema
@@ -127,6 +153,9 @@ async function register (server, options) {
         let response = await serviceController.getOne(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -144,7 +173,13 @@ async function register (server, options) {
       },
       tags: ['api', 'services'],
       validate: {
-        params: SCHEMAS.GetServiceSchema
+        params: SCHEMAS.GetServiceSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.GetServiceResponseSchema
@@ -165,6 +200,9 @@ async function register (server, options) {
         const { pre: { serviceController } } = request
         let response = await serviceController.update(request, h)
         return response
+      },
+      cors: {
+        origin: 'ignore'
       },
       plugins: {
         'hapi-swagger': {

@@ -3,7 +3,7 @@ const SCHEMAS = require('./schema')
 const { inject } = require('../plugin/awilix-hapi')
 const { API: { API_PATH } } = require('../config')
 
-async function register (server, options) {
+async function register (server, options) { // eslint-disable-line no-unused-vars
   server.route({
     method: 'GET',
     path: '/users/ping',
@@ -93,7 +93,13 @@ async function register (server, options) {
       },
       tags: ['api', 'users'],
       validate: {
-        params: SCHEMAS.DeleteUserSchema
+        params: SCHEMAS.DeleteUserSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.DeleteUserResponseSchema
@@ -131,7 +137,13 @@ async function register (server, options) {
       },
       tags: ['api', 'users'],
       validate: {
-        query: SCHEMAS.GetUsersQuerySchema
+        query: SCHEMAS.GetUsersQuerySchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.UsersResponseSchema
@@ -171,7 +183,13 @@ async function register (server, options) {
       },
       tags: ['api', 'users'],
       validate: {
-        params: SCHEMAS.GetUserSchema
+        params: SCHEMAS.GetUserSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.GetUserResponseSchema
@@ -250,7 +268,13 @@ async function register (server, options) {
       },
       tags: ['api', 'users'],
       validate: {
-        payload: SCHEMAS.AuthUserSchema
+        payload: SCHEMAS.AuthUserSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.AuthUserResponseSchema
@@ -289,7 +313,13 @@ async function register (server, options) {
       },
       tags: ['api', 'users'],
       validate: {
-        payload: SCHEMAS.ForgotPasswordSchema
+        payload: SCHEMAS.ForgotPasswordSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.ForgotPasswordResponseSchema
@@ -327,7 +357,13 @@ async function register (server, options) {
       },
       tags: ['api', 'users'],
       validate: {
-        params: SCHEMAS.VerifyResetPasswordTokenSchema
+        params: SCHEMAS.VerifyResetPasswordTokenSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.VerifyResetPasswordTokenResponseSchema
@@ -365,7 +401,13 @@ async function register (server, options) {
       },
       tags: ['api', 'users'],
       validate: {
-        payload: SCHEMAS.ResetPasswordSchema
+        payload: SCHEMAS.ResetPasswordSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.ResetPasswordResponseSchema

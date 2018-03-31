@@ -3,7 +3,7 @@ const { API: { API_PATH } } = require('../config')
 const { inject } = require('../plugin/awilix-hapi')
 const SCHEMAS = require('./schema')
 
-async function register (server, options) {
+async function register (server, options) { // eslint-disable-line no-unused-vars
   // create
   server.route({
     method: 'POST',
@@ -14,6 +14,9 @@ async function register (server, options) {
         const { pre: { priceController } } = request
         let response = await priceController.create(request, h)
         return response
+      },
+      cors: {
+        origin: 'ignore'
       },
       plugins: {
         'hapi-swagger': {
@@ -32,7 +35,13 @@ async function register (server, options) {
       },
       tags: ['api', 'prices'],
       validate: {
-        payload: SCHEMAS.CreatePriceSchema
+        payload: SCHEMAS.CreatePriceSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.CreatePriceResponseSchema
@@ -53,6 +62,9 @@ async function register (server, options) {
         let response = await priceController.delete(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -70,7 +82,13 @@ async function register (server, options) {
       },
       tags: ['api', 'prices'],
       validate: {
-        params: SCHEMAS.DeletePriceSchema
+        params: SCHEMAS.DeletePriceSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.DeletePriceResponseSchema
@@ -89,6 +107,9 @@ async function register (server, options) {
         let response = await priceController.list(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -106,7 +127,13 @@ async function register (server, options) {
       },
       tags: ['api', 'prices'],
       validate: {
-        query: SCHEMAS.GetListPriceQuerySchema
+        query: SCHEMAS.GetListPriceQuerySchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.ListPriceResponseSchema
@@ -126,6 +153,9 @@ async function register (server, options) {
         let response = await priceController.get(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -144,7 +174,13 @@ async function register (server, options) {
       pre: [inject('priceController')],
       tags: ['api', 'prices'],
       validate: {
-        params: SCHEMAS.GetPriceSchema
+        params: SCHEMAS.GetPriceSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.GetPriceResponseSchema
@@ -166,6 +202,9 @@ async function register (server, options) {
         let response = await priceController.update(request, h)
         return response
       },
+      cors: {
+        origin: 'ignore'
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -183,7 +222,13 @@ async function register (server, options) {
       },
       tags: ['api', 'prices'],
       validate: {
-        params: SCHEMAS.UpdatePriceParamSchema
+        params: SCHEMAS.UpdatePriceParamSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
       },
       response: {
         schema: SCHEMAS.UpdatePriceResponseSchema

@@ -165,7 +165,7 @@ const init = async () => {
   ])
 
   await server.start()
-  console.log(`Server running at: ${server.info.uri}`)
+  console.log(`Server running at: ${server.info.uri}`) // eslint-disable-line no-console
 }
 
 process.on('unhandledRejection', (err) => {
