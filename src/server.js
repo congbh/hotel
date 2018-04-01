@@ -8,6 +8,7 @@ const Pack = require('../package.json')
 const awilix = require('awilix')
 const { awilixHapiPlugin } = require('./plugin/awilix-hapi')
 const connection = require('./db/connection')
+const config = require('./config')
 
 const container = awilix.createContainer({
   injectionMode: awilix.InjectionMode.PROXY
@@ -66,6 +67,17 @@ container.register({
 const server = Hapi.server({
   port: process.env.PORT || 8080
 })
+
+const _verifyTokenLogin = async (decoded, request, h) => { // eslint-disable-line no-unused-vars
+  const userService = container.resolve('userService')
+  let { id } = decoded
+  let user = await userService.getOne(id)
+  if (!user) {
+    return { isValid: false }
+  } else {
+    return { isValid: true }
+  }
+}
 
 const init = async () => {
   const HapiSwaggerConfig = {
@@ -136,7 +148,7 @@ const init = async () => {
           args: [{ error: '*' }]
         }, {
           module: 'good-http',
-          args: ['http://localhost:8000/logs', {
+          args: ['http://localhost:8080/logs', {
             wreck: {
               headers: { 'x-api-key': 12345 }
             }
@@ -145,6 +157,17 @@ const init = async () => {
       }
     }
   }
+
+  await server.register(require('hapi-auth-jwt2'))
+  server.auth.strategy('jwt', 'jwt',
+    {
+      key: config.API.SECRET_KEY,
+      validate: _verifyTokenLogin,
+      verifyOptions: {
+        algorithms: [ 'HS256' ]
+      }
+    })
+  server.auth.default('jwt')
 
   await server.register([
     Vision,
@@ -170,6 +193,7 @@ const init = async () => {
 
 process.on('unhandledRejection', (err) => {
   if (err) {
+    console.error(`An error occurs when server is starting at: `, err)  // eslint-disable-line no-console
     process.exit(1)
   }
 })

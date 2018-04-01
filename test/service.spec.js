@@ -30,14 +30,14 @@ describe('Testing service api', () => {
   //   expect(response.result).to.be.exists()
   // })
 
-  it('should get list', async () => {
-    const response = await Server.inject({
-      method: 'GET',
-      url: '/services?filter={}&limit=10&offset=0'
-    })
-    expect(response.statusCode).to.equal(200)
-    expect(response.result.length).to.be.greaterThan(0)
-  })
+  // it('should get list', async () => {
+  //   const response = await Server.inject({
+  //     method: 'GET',
+  //     url: '/services?filter={}&limit=10&offset=0'
+  //   })
+  //   expect(response.statusCode).to.equal(200)
+  //   expect(response.result.length).to.be.greaterThan(0)
+  // })
 
   // it('should update', async () => {
   //   const response = await Server.inject({

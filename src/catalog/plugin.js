@@ -4,11 +4,11 @@ const { inject } = require('../plugin/awilix-hapi')
 const { API: { API_PATH } } = require('../config')
 
 async function register (server, options) { // eslint-disable-line no-unused-vars
-  // create 
   server.route({
     method: 'POST',
     path: `${API_PATH}/catalog`,
     options: {
+      auth: 'jwt',
       pre: [inject('catalogController')],
       handler: async function (request, h) {
         const { pre: { catalogController } } = request
@@ -55,6 +55,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'DELETE',
     path: `${API_PATH}/catalog/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Delete catalog by id',
       pre: [inject('catalogController')],
       handler: async function (request, h) {
@@ -101,6 +102,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'GET',
     path: `${API_PATH}/catalog`,
     options: {
+      auth: 'jwt',
       pre: [ inject('catalogController') ],
       handler: async function (request, h) {
         const { pre: { catalogController } } = request
@@ -147,6 +149,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'GET',
     path: `${API_PATH}/catalog/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Get a catalog by id',
       pre: [inject('catalogController')],
       handler: async function (request, h) {
@@ -193,6 +196,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'PUT',
     path: `${API_PATH}/catalog/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Update catalog by id',
       pre: [
         inject('catalogController')

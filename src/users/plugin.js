@@ -5,22 +5,10 @@ const { API: { API_PATH } } = require('../config')
 
 async function register (server, options) { // eslint-disable-line no-unused-vars
   server.route({
-    method: 'GET',
-    path: '/users/ping',
-    config: {
-      pre: [inject('userController')],
-      handler: async function (request, h) {
-        const { pre: { userController } } = request
-        let response = await userController.ping(request, h)
-        return response
-      }
-    }
-  })
-
-  server.route({
     method: 'POST',
     path: `${API_PATH}/users`,
     options: {
+      auth: 'jwt',
       pre: [inject('userController')],
       handler: async function (request, h) {
         const { pre: { userController } } = request
@@ -66,6 +54,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'DELETE',
     path: `${API_PATH}/users/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Delete user by id',
       pre: [inject('userController')],
       handler: async function (request, h) {
@@ -111,6 +100,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'GET',
     path: `${API_PATH}/users`,
     options: {
+      auth: 'jwt',
       pre: [inject('userController')],
       handler: async function (request, h) {
         const { pre: { userController } } = request
@@ -156,6 +146,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'GET',
     path: `${API_PATH}/users/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Get user by id',
       pre: [inject('userController')],
       handler: async function (request, h) {
@@ -198,9 +189,47 @@ async function register (server, options) { // eslint-disable-line no-unused-var
   })
 
   server.route({
+    method: 'GET',
+    path: `${API_PATH}/users/me`,
+    options: {
+      auth: 'jwt',
+      description: 'Get current user profile',
+      pre: [inject('userController')],
+      handler: async function (request, h) {
+        const { pre: { userController } } = request
+        let response = await userController.me(request, h)
+        return response
+      },
+      cors: {
+        origin: 'ignore'
+      },
+      plugins: {
+        'hapi-swagger': {
+          responses: {
+            '200': {
+              description: 'Success',
+              schema: SCHEMAS.GetUserResponseSchema
+            },
+            '400': {
+              description: 'Bad Request',
+              schema: SCHEMAS.Error
+            }
+          },
+          security: {}
+        }
+      },
+      tags: ['api', 'users'],
+      response: {
+        schema: SCHEMAS.GetUserResponseSchema
+      }
+    }
+  })
+
+  server.route({
     method: 'PUT',
     path: `${API_PATH}/users/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Update user by id',
       pre: [inject('userController')],
       handler: async function (request, h) {
@@ -241,6 +270,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'POST',
     path: `${API_PATH}/users/auth`,
     options: {
+      auth: false,
       description: 'Authentication user',
       pre: [inject('userController')],
       handler: async function (request, h) {
@@ -286,6 +316,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'POST',
     path: `${API_PATH}/users/forgot-password`,
     options: {
+      auth: 'jwt',
       description: 'Fotgot password',
       pre: [inject('userController')],
       handler: async function (request, h) {
@@ -331,6 +362,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'GET',
     path: `${API_PATH}/users/verify-reset-password/{token}`,
     options: {
+      auth: 'jwt',
       pre: [inject('userController')],
       handler: async function (request, h) {
         const { pre: { userController } } = request
@@ -375,6 +407,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'POST',
     path: `${API_PATH}/users/reset-password`,
     options: {
+      auth: 'jwt',
       pre: [inject('userController')],
       handler: async function (request, h) {
         const { pre: { userController } } = request

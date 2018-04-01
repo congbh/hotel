@@ -8,6 +8,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'POST',
     path: `${API_PATH}/services`,
     options: {
+      auth: 'jwt',
       pre: [inject('serviceController')],
       handler: async function (request, h) {
         const { pre: { serviceController } } = request
@@ -54,6 +55,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'DELETE',
     path: `${API_PATH}/services/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Delete service by id',
       pre: [inject('serviceController')],
       handler: async function (request, h) {
@@ -100,6 +102,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'GET',
     path: `${API_PATH}/services`,
     options: {
+      auth: 'jwt',
       pre: [ inject('serviceController') ],
       handler: async function (request, h) {
         const { pre: { serviceController } } = request
@@ -146,6 +149,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'GET',
     path: `${API_PATH}/services/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Get a service by id',
       pre: [inject('serviceController')],
       handler: async function (request, h) {
@@ -192,6 +196,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'PUT',
     path: `${API_PATH}/services/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Update service by id',
       pre: [
         inject('serviceController')

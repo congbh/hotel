@@ -9,6 +9,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'POST',
     path: `${API_PATH}/floors`,
     options: {
+      auth: 'jwt',
       pre: [inject('floorController')],
       handler: async function (request, h) {
         const { pre: { floorController } } = request
@@ -55,6 +56,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'DELETE',
     path: `${API_PATH}/floors/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Delete floor by id',
       pre: [inject('floorController')],
       handler: async function (request, h) {
@@ -101,6 +103,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'GET',
     path: `${API_PATH}/floors`,
     options: {
+      auth: 'jwt',
       pre: [ inject('floorController') ],
       handler: async function (request, h) {
         const { pre: { floorController } } = request
@@ -147,6 +150,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'GET',
     path: `${API_PATH}/floors/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Get floor by id',
       handler: async function (request, h) {
         const { pre: { floorController } } = request
@@ -193,6 +197,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'PUT',
     path: `${API_PATH}/floors/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Update hotel by id',
       pre: [
         inject('floorController')

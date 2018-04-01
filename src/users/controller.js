@@ -1,6 +1,6 @@
 const Boom = require('boom')
 const Crypto = require('crypto')
-
+const atob = require('atob')
 // const secret = ''
 
 class UserController {
@@ -10,6 +10,12 @@ class UserController {
 
   _createResetPasswordToken () {
     return Crypto.randomBytes(20).toString('hex')
+  }
+
+  _parseJwt (token) {
+    var base64Url = token.split('.')[1]
+    var base64 = base64Url.replace('-', '+').replace('_', '/')
+    return JSON.parse(atob(base64))
   }
 
   async _updateResetPasswordToken (id, token) {
@@ -24,8 +30,8 @@ class UserController {
 
   async authenticate (request, h) {
     try {
-      let token = await this.userService.authenticate(request.payload)
-      return h.response({ token }).code(200)
+      let { token, id } = await this.userService.authenticate(request.payload)
+      return h.response({ token, uid: id }).code(200)
     } catch (error) {
       return Boom.badRequest(error)
     }
@@ -53,6 +59,17 @@ class UserController {
   async getOne (req, h) {
     try {
       const { id } = req.params
+      let user = await this.userService.getOne(id)
+      return h.response(user).code(200)
+    } catch (error) {
+      return Boom.badRequest(error)
+    }
+  }
+
+  async me (req, h) {
+    try {
+      const { headers: { authorization } } = req
+      let { id } = this._parseJwt(authorization)
       let user = await this.userService.getOne(id)
       return h.response(user).code(200)
     } catch (error) {
@@ -109,14 +126,6 @@ class UserController {
     } catch (error) {
       return Boom.badRequest(error)
     }
-  }
-
-  async ping (req, h) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve('Test')
-      }, 100)
-    })
   }
 }
 

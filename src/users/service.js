@@ -54,12 +54,11 @@ class UserService {
     return user
   }
 
-  _createToken ({ id, username }) {
+  _createToken ({ id, email }) {
     return jwt.sign(
       {
         id: id,
-        username: username,
-        scope: id
+        email: email
       },
       API.SECRET_KEY,
       {
@@ -74,7 +73,7 @@ class UserService {
       const { username = '', email = '', password } = payload
       let user = await this._verifyCredentials(username, email, password)
       let token = this._createToken(user)
-      return token
+      return { token, id: user.id }
     } catch (error) {
       throw error
     }

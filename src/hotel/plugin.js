@@ -30,6 +30,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'POST',
     path: `${API_PATH}/hotels`,
     options: {
+      auth: 'jwt',
       pre: [inject('hotelController')],
       handler: async function (req, h) {
         let response = await req.pre.hotelController.create(req, h)
@@ -75,6 +76,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'DELETE',
     path: `${API_PATH}/hotels/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Delete Hotel by id',
       pre: [inject('hotelController')],
       handler: async function (request, h) {
@@ -121,6 +123,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'GET',
     path: `${API_PATH}/hotels`,
     options: {
+      auth: 'jwt',
       pre: [ inject('hotelController') ],
       handler: async function (request, h) {
         const { pre: { hotelController } } = request
@@ -166,15 +169,16 @@ async function register (server, options) { // eslint-disable-line no-unused-var
   server.route({
     method: 'GET',
     path: `${API_PATH}/hotels/{id}`,
-    handler: async function (request, h) {
-      const { pre: { hotelController } } = request
-      let response = await hotelController.getOne(request, h)
-      return response
-    },
     options: {
+      auth: 'jwt',
       description: 'Get hotel by id',
       cors: {
         origin: 'ignore'
+      },
+      handler: async function (request, h) {
+        const { pre: { hotelController } } = request
+        let response = await hotelController.getOne(request, h)
+        return response
       },
       plugins: {
         'hapi-swagger': {
@@ -213,6 +217,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'PUT',
     path: `${API_PATH}/hotels/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Update hotel by id',
       pre: [
         inject('hotelController')

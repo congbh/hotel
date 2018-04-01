@@ -9,6 +9,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'POST',
     path: `${API_PATH}/room_types`,
     options: {
+      auth: 'jwt',
       pre: [inject('roomTypeController')],
       handler: async function (request, h) {
         const { pre: { roomTypeController } } = request
@@ -55,6 +56,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'DELETE',
     path: `${API_PATH}/room_types/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Delete Room by id',
       pre: [inject('roomTypeController')],
       handler: async function (request, h) {
@@ -101,6 +103,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'GET',
     path: `${API_PATH}/room_types`,
     options: {
+      auth: 'jwt',
       pre: [ inject('roomTypeController') ],
       handler: async function (request, h) {
         const { pre: { roomTypeController } } = request
@@ -147,6 +150,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'GET',
     path: `${API_PATH}/room_types/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Get Room by id',
       handler: async function (request, h) {
         const { pre: { roomTypeController } } = request
@@ -193,6 +197,7 @@ async function register (server, options) { // eslint-disable-line no-unused-var
     method: 'PUT',
     path: `${API_PATH}/room_types/{id}`,
     options: {
+      auth: 'jwt',
       description: 'Update room by id',
       pre: [
         inject('roomTypeController')
