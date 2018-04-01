@@ -90,7 +90,8 @@ module.exports.AuthUserSchema = Joi.alternatives().try(
 )
 
 module.exports.AuthUserResponseSchema = Joi.object({
-  token: Joi.string().required()
+  token: Joi.string(),
+  uid: Joi.string().guid()
 }).label('Response')
 
 module.exports.ForgotPasswordSchema = Joi.object({

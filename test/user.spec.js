@@ -60,19 +60,17 @@ describe('Testing user api', () => {
   //   })
   // })
 
-  // it('should authenticate user', async () => {
-  //   request.post({
-  //     url: `${BASE_API_URL}/users/authenticate`,
-  //     json: true,
-  //     formData: {
-  //       email: 'aaa@gmail.com',
-  //       password: 'aaa'
-  //     }
-  //   }, function (err, res, body) {
-  //     expect(err).to.not.exist()
-  //     expect(body).to.be.exist()
-  //   })
-  // })
+  it('should authenticate user', async () => {
+    const response = await Server.inject({
+      method: 'POST',
+      url: API_PATH + '/users/auth',
+      payload: {
+        email: 'bachhungcong@gmail.com',
+        password: 'congbh'
+      }
+    })
+    expect(response.statusCode).to.equal(200)
+  })
 
   // it('should create user', async () => {
   //   const response = await Server.inject({
@@ -113,7 +111,7 @@ describe('Testing user api', () => {
       url: API_PATH + '/users/me',
       headers: { authorization: token }
     })
-    console.log(response.result)
+    // console.log(response.result)
     expect(response.statusCode).to.equal(200)
     // expect(response.result.length).to.be.greaterThan(0)
   })
