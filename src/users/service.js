@@ -99,7 +99,7 @@ class UserService {
     try {
       const { username = '', email = '', password } = payload
       let user = await this._verifyCredentials(username, email, password)
-      const [token, refresh_token] = this._createToken(user) // eslint-disable-line camelcase
+      const [token, refresh_token] = await this._createToken(user) // eslint-disable-line camelcase
       return { token, refresh_token, id: user.id }
     } catch (error) {
       throw error
