@@ -54,8 +54,8 @@ class UserService {
     return user
   }
 
-  _createToken ({ id, email }) {
-    return jwt.sign(
+  async _createToken ({ id, email }) {
+    const token = jwt.sign(
       {
         id: id,
         email: email
@@ -66,14 +66,41 @@ class UserService {
         expiresIn: '1h'
       }
     )
+    const refreshToken = jwt.sign(
+      {
+        id: id,
+        email: email
+      },
+      API.SECRET_KEY,
+      {
+        expiresIn: '7d'
+      }
+    )
+    return Promise.all([token, refreshToken])
+  }
+
+  async refreshToken (payload) {
+    try {
+      const { refresh_token } = payload
+      const { id } = jwt.verify(refresh_token, API.SECRET_KEY)
+      let user = await this.repository.load(id)
+      const [_token, _refreshToken] = await this._createToken(user)
+      return {
+        token: _token,
+        refresh_token: _refreshToken,
+        id
+      }
+    } catch (error) {
+      throw error
+    }
   }
 
   async authenticate (payload) {
     try {
       const { username = '', email = '', password } = payload
       let user = await this._verifyCredentials(username, email, password)
-      let token = this._createToken(user)
-      return { token, id: user.id }
+      const [token, refresh_token] = this._createToken(user) // eslint-disable-line camelcase
+      return { token, refresh_token, id: user.id }
     } catch (error) {
       throw error
     }

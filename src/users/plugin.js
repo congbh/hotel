@@ -314,6 +314,52 @@ async function register (server, options) { // eslint-disable-line no-unused-var
 
   server.route({
     method: 'POST',
+    path: `${API_PATH}/users/refresh_token`,
+    options: {
+      auth: false,
+      description: 'Refresh token login',
+      pre: [inject('userController')],
+      handler: async function (request, h) {
+        const { pre: { userController } } = request
+        let response = await userController.refreshToken(request, h)
+        return response
+      },
+      cors: {
+        origin: 'ignore'
+      },
+      plugins: {
+        'hapi-swagger': {
+          responses: {
+            '200': {
+              description: 'Success',
+              schema: SCHEMAS.RefreshTokenResponseSchema
+            },
+            '400': {
+              description: 'Bad Request',
+              schema: SCHEMAS.Error
+            }
+          },
+          security: {}
+        }
+      },
+      tags: ['api', 'users'],
+      validate: {
+        payload: SCHEMAS.RefreshTokenSchema,
+        failAction: (request, h, error) => {
+          return h
+            .response({ message: error.details[0].message.replace(/['"]+/g, '') })
+            .code(400)
+            .takeover()
+        }
+      },
+      response: {
+        schema: SCHEMAS.RefreshTokenResponseSchema
+      }
+    }
+  })
+
+  server.route({
+    method: 'POST',
     path: `${API_PATH}/users/forgot-password`,
     options: {
       auth: 'jwt',

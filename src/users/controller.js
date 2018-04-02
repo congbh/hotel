@@ -30,8 +30,8 @@ class UserController {
 
   async authenticate (request, h) {
     try {
-      let { token, id } = await this.userService.authenticate(request.payload)
-      return h.response({ token, uid: id }).code(200)
+      const { token, refresh_token, id } = await this.userService.authenticate(request.payload)
+      return h.response({ token, refresh_token, uid: id }).code(200)
     } catch (error) {
       return Boom.badRequest(error)
     }
@@ -41,6 +41,15 @@ class UserController {
     try {
       let result = await this.userService.create(request.payload)
       return h.response(result).code(200)
+    } catch (error) {
+      return Boom.badRequest(error)
+    }
+  }
+
+  async refreshToken (request, h) {
+    try {
+      const { token, refresh_token, id } = await this.userService.refreshToken(request.payload)
+      return h.response({ token, refresh_token, uid: id }).code(200)
     } catch (error) {
       return Boom.badRequest(error)
     }
