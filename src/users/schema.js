@@ -104,7 +104,7 @@ module.exports.RefreshTokenSchema = Joi.object({
   refresh_token: Joi.string().required()
 })
 module.exports.RefreshTokenResponseSchema = Joi.object({
-  token: Joi.string().required(),
-  refresh_token: Joi.string().required(),
-  uid: Joi.string().guid().required()
+  token: Joi.string(),
+  refresh_token: Joi.string(),
+  uid: Joi.string().guid()
 }).label('Response')

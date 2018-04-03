@@ -73,6 +73,7 @@ class UserService {
       },
       API.SECRET_KEY,
       {
+        algorithm: 'HS256',
         expiresIn: '7d'
       }
     )
@@ -82,7 +83,7 @@ class UserService {
   async refreshToken (payload) {
     try {
       const { refresh_token } = payload
-      const { id } = jwt.verify(refresh_token, API.SECRET_KEY)
+      const { id } = jwt.verify(refresh_token.trim(), API.SECRET_KEY)
       let user = await this.repository.load(id)
       const [_token, _refreshToken] = await this._createToken(user)
       return {
